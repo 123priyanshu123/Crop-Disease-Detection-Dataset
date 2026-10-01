@@ -86,22 +86,22 @@ The application is structured as a decoupled, multi-tier precision agriculture p
 ```mermaid
 flowchart TD
     subgraph Client["Presentation Tier (Client / Browser)"]
-        A[User Device / Smartphone] -->|Uploads Image / Selects Test Sample| B[Streamlit Dashboard (app.py)]
-        B -->|Renders UI| C[Diagnostic Badges & Treatment Tabs]
+        A["User Device / Smartphone"] -->|Uploads Image / Selects Test Sample| B["Streamlit Dashboard (app.py)"]
+        B -->|Renders UI| C["Diagnostic Badges & Treatment Tabs"]
     end
 
     subgraph Logic["Application & Inference Tier"]
-        B -->|Raw RGB Image| D[TorchVision Preprocessing Pipeline]
-        D -->|Normalized Tensor 1x3x224x224| E[PyTorch ResNet-18 Model]
-        F[(plant_disease_model.pth)] -->|Model Parameters| E
-        E -->|Logits & Softmax| G[Inference & Confidence Scorer]
-        G -->|Top-1 Diagnosis & Top-3 Probabilities| B
+        B -->|Raw RGB Image| D["TorchVision Preprocessing Pipeline"]
+        D -->|"Normalized Tensor 1x3x224x224"| E["PyTorch ResNet-18 Model"]
+        F[("plant_disease_model.pth")] -->|Model Parameters| E
+        E -->|"Logits & Softmax"| G["Inference & Confidence Scorer"]
+        G -->|"Top-1 Diagnosis & Top-3 Probabilities"| B
     end
 
     subgraph Knowledge["Domain Knowledge & Data Tier"]
-        G -->|Queries Disease Condition| H[(Agronomic Knowledge Base)]
-        H -->|Symptoms, Organic & Chemical Remedies| B
-        I[(PlantVillage Dataset)] -->|Train / Val / Test Images| J[Training Pipeline (Crop_Disease_Detection.ipynb)]
+        G -->|Queries Disease Condition| H[("Agronomic Knowledge Base")]
+        H -->|"Symptoms, Organic & Chemical Remedies"| B
+        I[("PlantVillage Dataset")] -->|"Train / Val / Test Images"| J["Training Pipeline (Crop_Disease_Detection.ipynb)"]
         J -->|Saves Best Weights| F
     end
 ```
