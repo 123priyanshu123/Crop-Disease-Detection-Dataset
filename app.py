@@ -215,7 +215,11 @@ def load_pytorch_model():
     # Initialize ResNet-18
     model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
     in_features = model.fc.in_features
-    model.fc = nn.Linear(in_features, num_classes)
+    # Match the Sequential(Dropout, Linear) architecture from training
+    model.fc = nn.Sequential(
+        nn.Dropout(p=0.3),
+        nn.Linear(in_features, num_classes)
+    )
     
     weights_path = "plant_disease_model.pth"
     is_trained = False
@@ -228,9 +232,15 @@ def load_pytorch_model():
                 state_dict = state_dict["state_dict"]
             model.load_state_dict(state_dict)
             is_trained = True
-        except Exception as e:
-            st.sidebar.warning(f"Note loading custom checkpoint: {e}. Using initialized model.")
-            is_trained = False
+        except Exception:
+            # Fallback if checkpoint was saved with single Linear layer
+            try:
+                model.fc = nn.Linear(in_features, num_classes)
+                model.load_state_dict(state_dict)
+                is_trained = True
+            except Exception as e:
+                st.sidebar.warning(f"Note loading custom checkpoint: {e}. Using initialized model.")
+                is_trained = False
             
     model = model.to(device)
     model.eval()
